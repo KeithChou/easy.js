@@ -8,15 +8,15 @@ class Ajax {
       async: true,
       time: 10000,
       success (data) {},
-      fail (err) {}
+      fail (err) {},
       timeout (err) {},
       error () {}
     }
     this.options = Object.assign({}, setting, options)
   }
-  init (() {
+  init () {
     this.createRequest()
-  })()
+  }
   handleResponse (data) {
     if (data) {
       if (data.success) {
@@ -39,11 +39,12 @@ class Ajax {
   }
   createRequest() {
     let [xhr, type, url, async] = [new window.XMLHttpRequest(), this.options.type.toLowerCase(), this.options.url, this.options.async]
-    let data = this.paramToString(this.options.data)
+    let data = paramToString.call(this, this.options.data)
     let ajax = new Promise((resolve, reject) => {
       xhr.addEventListener('readystatechange', () => {
         if (xhr.readyState === 4) {
           if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            // 返回的数据必须是合法的JSON字符串
             let data = JSON.parse(xhr.responsetText)
             resolve(data)
           }
@@ -72,15 +73,16 @@ class Ajax {
         this.options.timeout()
       })
   }
-  paramToString (obj) {
-    let [str = ''] = []
-    for (let i in obj) {
-      let name = window.encodeURIComponent(i)
-      let value = window.encodeURIComponent(obj[i])
-      str +=  `&${name}=${value}`
-    }
-    return str.slice(1)
+}
+
+const paramToString = (obj) => {
+  let [str = ''] = []
+  for (let i in obj) {
+    let name = window.encodeURIComponent(i)
+    let value = window.encodeURIComponent(obj[i])
+    str +=  `&${name}=${value}`
   }
+  return str.slice(1)
 }
 
 export default Ajax
