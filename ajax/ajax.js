@@ -33,33 +33,44 @@ class Ajax {
   handleTimeOut () {
     window.setTimeout(timer => {
       if (this.options.timeout instanceof Function) {
-        this.options.timeout('timeout')
-        return
+        throw new Error('网络错误，请重试！')
       }
     }, this.options.time)
   }
   createRequest() {
     let [xhr, type, url, async] = [new window.XMLHttpRequest(), this.options.type.toLowerCase(), this.options.url, this.options.async]
     let data = this.paramToString(this.options.data)
-    xhr.addEventListener('readystatechange', () => {
-      if (xhr.readyState === 4) {
-        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
-          let data = JSON.parse(xhr.responsetText)
-          this.handleResponse(data)
-        } else {
-          this.handleResponse()
+    let ajax = new Promise((resolve, reject) => {
+      xhr.addEventListener('readystatechange', () => {
+        if (xhr.readyState === 4) {
+          if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            let data = JSON.parse(xhr.responsetText)
+            resolve(data)
+          }
+          // 请求已发出，在time之内，未收到响应。可能是网络错误导致
+          reject()
         }
+      })
+      if (type === 'get') {
+        xhr.open(type, `${url}?${data}`, async)
+        xhr.send(null)
+      } else {
+        xhr.open(type, url, async)
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencode')
+        xhr.send(data)
       }
     })
-    if (type === 'get') {
-      xhr.open(type, `${url}?${data}`, async)
-      xhr.send(null)
-    } else {
-      xhr.open(type, url, async)
-      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencode')
-      xhr.send(data)
-    }
-    this.handleTimeOut()
+    let time = new Promise((resolve, reject) => {
+      reject(this.handleTimeOut())
+    })
+    Promise
+      .race([ajax, time])
+      .then(data => {
+        this.handleResponse(data)
+      })
+      .catch(err => {
+        this.options.timeout()
+      })
   }
   paramToString (obj) {
     let [str = ''] = []
