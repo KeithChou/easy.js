@@ -78,7 +78,7 @@ class Easy {
       format = format.replace(reg, i)
     }
     format = format.replace(/[YMDhms]/g, (val, index, arr) => {
-      val = T[val]
+      val = T[val] < 10 ? `0${T[val]}` : T[val]
       return val
     })
     return format
