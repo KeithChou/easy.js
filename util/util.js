@@ -1,6 +1,9 @@
 import Ajax from '../ajax/ajax.js'
 
 class Util extends Ajax {
+  constructor () {
+    this.href = ''
+  }
   error (text) {
     let err = new Error(text)
     throw err
@@ -26,6 +29,30 @@ class Util extends Ajax {
       return val
     })
     return format
+  }
+  hash () {
+    this.href = window.location.href
+    if (/[#]/g.test(this.href)) {
+      return window.location.hash
+    } else {
+      return '""'
+    }
+  }
+  query () {
+    this.href = 'http://localhost:8085/purchase_flow.html#/buy?end_ts=1504022400&id=26&price=7520000&start_ts=1503972000&username1=82&username2=83'
+    if (/[?]/g.test(this.href)) {
+      let index = this.href.indexOf('?')
+      let [arr, paramToObj, param, name, value] = [this.href.slice(index + 1).split('&'), {}]
+      for (let i in arr) {
+        param = arr[i].split('=')
+        name = window.encodeURIComponent(param[0])
+        value = window.encodeURIComponent(param[1])
+        paramToObj[name] = value
+      }
+      return paramToObj
+    } else {
+      return '""'
+    }
   }
 }
 
