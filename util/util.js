@@ -84,6 +84,33 @@ class Util extends Ajax {
       }
     }
   }
+  function debounce (fn, wait, immediate = false) {
+    let [time, result, timestamp, args, context] = []
+    function later () {
+      let late = +new Date() - timestamp
+      if (wait > late && late >= 0) {
+        time = window.setTimeout(later, wait - late)
+      } else {
+        time = null
+        result = fn.apply(context, args)
+        context = args = null
+      }
+    }
+    return function () {
+      context = this
+      args = arguments
+      timestamp = +new Date()
+      let callNow = immediate && !time
+      if (!time) {
+        time = window.setTimeout(later, wait)
+      }
+      if (callNow) {
+        result = fn.apply(context, args)
+        context = args = null
+      }
+      return result
+    }
+  }
 }
 
 export default Util
