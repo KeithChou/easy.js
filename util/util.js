@@ -60,7 +60,7 @@ class Util extends Ajax {
     let setting = {
       delay: 300,
       mustRunTime: 500,
-      firstDelay: true
+      immediate: true
     }
     option = Object.assign({}, setting, option)
     return function () {
@@ -69,10 +69,10 @@ class Util extends Ajax {
       if (!start) {
         start = currStart
       }
-      if (!option.firstDelay || currStart - start > option.mustRunTime) {
+      if (!option.immediate || currStart - start > option.mustRunTime) {
         fn.apply(this, args)
         start = currStart
-        option.firstDelay = true
+        option.immediate = true
       } else {
         window.clearTimeout(time)
         time = window.setTimeout(() => {
