@@ -57,6 +57,9 @@ class Util extends Ajax {
   throttle (fn, option) {
     let time = null
     let start = null
+    // delay: 延迟执行时间
+    // mustRunTime: 若函数500内仍未执行，则会执行。场景如：resize按住不放超过500就会执行一次fn
+    // immediate: true：表明第一次要立即执行；false表明第一次需要等待delay之后执行
     let setting = {
       delay: 300,
       mustRunTime: 500,
