@@ -54,6 +54,33 @@ class Util extends Ajax {
       return '""'
     }
   }
+  throttle (fn, option) {
+    let time = null
+    let start = null
+    let setting = {
+      delay: 300,
+      mustRunTime: 500,
+      firstDelay: true
+    }
+    option = Object.assign({}, setting, option)
+    return function () {
+      let args = arguments
+      let currStart = +new Date()
+      if (!start) {
+        start = currStart
+      }
+      if (!option.firstDelay || currStart - start > option.mustRunTime) {
+        fn.apply(this, args)
+        start = currStart
+        option.firstDelay = true
+      } else {
+        window.clearTimeout(time)
+        time = window.setTimeout(() => {
+          fn.apply(this, args)
+        }, option.delay)
+      }
+    }
+  }
 }
 
 export default Util
