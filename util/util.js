@@ -84,7 +84,7 @@ class Util extends Ajax {
       }
     }
   }
-  function debounce (fn, wait, immediate = false) {
+  debounce (fn, wait, immediate = false) {
     let [time, result, timestamp, args, context] = []
     function later () {
       let late = +new Date() - timestamp
