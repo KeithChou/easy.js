@@ -1,10 +1,25 @@
 import Util from '../util/util.js'
 
+const ONCE = SYMBOL('ONCE')
 class Event extends Util {
+  constructor () {
+    this[ONCE] = false
+  }
   event (event, target, cb, bubble = false) {
     target.addEventListener(event, e => {
       cb(e)
     }, bubble)
+  }
+  event (event, target, cb, bubble = false) {
+    let events = e => {
+      cb(e)
+    }
+    if (this[ONCE]) {
+      target.removeEventListener(event, events, bubble)
+      return
+    }
+    this[ONCE] = true
+    target.addEventListener(event, events, bubble)
   }
   on (event, target, cb, bubble = false) {
     let doc = document
