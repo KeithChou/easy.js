@@ -54,6 +54,7 @@ class Util extends Ajax {
       return '""'
     }
   }
+  // 函数节流
   throttle (fn, option) {
     let time = null
     let start = null
@@ -84,6 +85,7 @@ class Util extends Ajax {
       }
     }
   }
+  // 函数防抖
   debounce (fn, wait, immediate = false) {
     let [time, result, timestamp, args, context] = []
     function later () {
@@ -110,6 +112,49 @@ class Util extends Ajax {
       }
       return result
     }
+  }
+  // 函数分时
+  timeChunk (arr, fn, option) {
+    // arr表示需要处理的数据
+    // fn为处理数据的回调
+    // option为参数
+    let timer = null
+    let inner // 执行定时器循环的变量
+    let setting = {
+      count: 10,   // 分批执行的个数
+      delay: 500   // 延迟执行的时间
+    }
+    option = Object.assign({}, setting, option)
+    let insert = () => {
+      let min = Math.min(option.count, arr.length)
+      for (let i = 0; i < min; i++) {
+        fn(arr.shift())
+      }
+    }
+    return function () {
+      timer = window.setTimeout(inner = () => {
+        if (!arr.length) { // 如果全部节点都已经被创建好
+          window.clearTimeout(timer)
+        } else {
+          insert()
+          inner()
+        }
+      }, option.delay) // 分批执行的时间间隔
+    }
+    /*
+      使用示例
+      var arr = []
+      for (var i = 1; i <= 1000; i++) {
+        arr.push(i)   // i表示好友列表
+      }
+      // arr表示有1000个好友的数组
+      var renderFriendList = timeChunk(arr, (data) => {
+        var div = ''
+        div = `<div>${data}</div>`
+        document.body.insertAdjacentHTML('beforeend', div)
+      }, { count: 10, delay: 500 })
+      renderFriendList()
+    */
   }
 }
 

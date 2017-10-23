@@ -1,6 +1,6 @@
 import Util from '../util/util.js'
 
-const ONCE = SYMBOL('ONCE')
+const ONCE = Symbol('ONCE')
 class Event extends Util {
   constructor () {
     this[ONCE] = false
@@ -10,7 +10,7 @@ class Event extends Util {
       cb(e)
     }, bubble)
   }
-  event (event, target, cb, bubble = false) {
+  one (event, target, cb, bubble = false) {
     let events = e => {
       cb(e)
     }
@@ -20,6 +20,43 @@ class Event extends Util {
     }
     this[ONCE] = true
     target.addEventListener(event, events, bubble)
+  }
+  on (event, target, cb, bubble = false) {
+    document.addEventListener(event, e => {
+      let obj = e.target
+      let { id, className, name } = {
+        id: obj.id,
+        className: obj.className,
+        name: obj.name
+      }
+      if (id) {
+        switch (id) {
+          case `${target.slice(1)}`:
+            cb(e)
+            break
+          default:
+            console.log('error')
+        }
+      }
+      if (className) {
+        switch (className) {
+          case `${target.slice(1)}`:
+            cb(e)
+            break
+          default:
+            console.log('error')
+        }
+      }
+      if (name) {
+        switch (id) {
+          case target:
+            cb(e)
+            break
+          default:
+            console.log('error')
+        }
+      }
+    })
   }
   on (event, target, cb, bubble = false) {
     let doc = document
