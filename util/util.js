@@ -156,6 +156,15 @@ class Util extends Ajax {
       renderFriendList()
     */
   }
+  // 函数柯里化
+  curry (fn, context) {
+    var args = Array.prototype.slice.call(arguments, 2)
+    return function () {
+      var arg = Array.prototype.slice.call(arguments)
+      var arr = args.concat(arg)
+      return fn.apply(context, arr)
+    }
+  }
 }
 
 export default Util
